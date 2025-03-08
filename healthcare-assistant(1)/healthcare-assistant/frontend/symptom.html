@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Checker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h2>Symptom Checker</h2>
+
+    <label for="bodyPart">Select Body Part:</label>
+    <select id="bodyPart">
+        <option value="head">Head</option>
+        <option value="chest">Chest</option>
+        <option value="stomach">Stomach</option>
+        <option value="skin">Skin</option>
+        <option value="joints">Joints</option>
+    </select>
+
+    <br><br>
+
+    <label for="symptomInput">Enter Symptoms (comma-separated):</label>
+    <input type="text" id="symptomInput" placeholder="e.g., fever, headache">
+    
+    <button onclick="checkSymptoms()">Check</button>
+
+    <h3>Possible Conditions:</h3>
+    <p id="result"></p>
+
+    <script src="symptomChecker.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>ChatBot</title>
+    
+      <!-- 
+        - favicon
+      -->
+      <link rel="shortcut icon" href="./favicon.svg" type="image/svg+xml">
+    
+      <!-- 
+        - custom css link
+      -->
+      <link rel="stylesheet" href="../frontend/styles.css">
+    
+    
+    
+      <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+      <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    
+      <style>
+        #map { height: 500px; width: 100%; }
+        button, select, input { margin: 5px; padding: 10px; }
+
+
+
+       
+        .chat-container {
+            width: 75%;
+            height: 60vh;
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-box {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #f9f9f9;
+            color: black;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid #ddd;
+        }
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px 0;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background: #007bff;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background: #ddd;
+            color: black;
+            align-self: flex-start;
+        }
+        .typing {
+            font-size: 12px;
+            color: gray;
+            font-style: italic;
+            padding-left: 10px;
+        }
+        .input-container {
+            display: flex;
+            gap: 5px;
+        }
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            outline: none;
+            background: white;
+            color: black;
+        }
+        button {
+            padding: 12px;
+            border: none;
+            background: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+    
+    
+    
+      <!-- 
+        - google font link
+      -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=League+Spartan:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    </head>
+    
+    <body id="top">
+    
+      <!-- 
+        - #HEADER
+      -->
+    
+      <header class="header" data-header>
+        <div class="container">
+    
+          <a href="#" class="logo">
+            <ion-icon name="Health-Assistance"></ion-icon> MediCare Assist
+          </a>
+    
+          <nav class="navbar container" data-navbar>
+            <ul class="navbar-list">
+    
+              <li>
+                <a href="../frontend/index.html" class="navbar-link" data-nav-link>Home</a>
+              </li>
+    
+              <li>
+                <a href="#" class="navbar-link" data-nav-link>HealthMate(Bot)</a>
+              </li>
+    
+              <li>
+                <a href="../frontend/maps.html" class="navbar-link" data-nav-link>ArogyaLocator</a>
+              </li>
+    
+    
+            </ul>
+          </nav>
+    
+        </div>
+      </header>
+    
+    
+    
+<br><br><br><br><br><br>
+
+      <body>
+        
+        <center>
+        <div class="chat-container">
+            <div class="chat-box" id="chat-box"></div>
+            <div class="input-container">
+                <input type="text" id="user-input" placeholder="Type a message..." onkeydown="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </center>
+        
+        <script>
+            async function sendMessage() {
+                const userInput = document.getElementById("user-input").value;
+                if (!userInput) return;
+                
+                appendMessage("You", userInput, "user-message");
+                document.getElementById("user-input").value = "";
+                
+                const chatBox = document.getElementById("chat-box");
+                const typingIndicator = document.createElement("div");
+                typingIndicator.textContent = "Bot is typing...";
+                typingIndicator.classList.add("typing");
+                chatBox.appendChild(typingIndicator);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                try {
+                    const response = await fetch("/api/chatbot/", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: userInput })
+                    });
+                    
+                    const data = await response.json();
+                    chatBox.removeChild(typingIndicator);
+                    appendMessage("Bot", data.response, "bot-message");
+                } catch (error) {
+                    console.error("Error:", error);
+                    chatBox.removeChild(typingIndicator);
+                    appendMessage("Bot", "Sorry, something went wrong.", "bot-message");
+                }
+            }
+            
+            function appendMessage(sender, message, className) {
+                const chatBox = document.getElementById("chat-box");
+                const messageElement = document.createElement("div");
+                messageElement.textContent = message;
+                messageElement.classList.add("message", className);
+                chatBox.appendChild(messageElement);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+            
+            function handleKeyPress(event) {
+                if (event.key === "Enter") {
+                    sendMessage();
+                }
+            }
+        </script>
+    </body>
+
+
+
+
+
+
+
+  <!-- 
+    - #FOOTER
+  -->
+
+  <footer class="footer">
+
+    <div class="footer-top">
+      <div class="container">
+
+        <div class="footer-brand">
+
+          <a href="#" class="logo">
+            <ion-icon name="medi-outline"></ion-icon> HealthAssist
+          </a>
+
+          <p class="footer-text">
+            A smart platform to help you find doctors, hospitals, and healthcare facilities near you.
+          </p>
+
+        </div>
+
+        <ul class="footer-list">
+
+          <li>
+            <p class="footer-list-title">Useful Links</p>
+          </li>
+
+          <li>
+            <a href="../frontend/index.html" class="footer-link">
+              <ion-icon name="chevron-forward"></ion-icon>
+
+              <span class="span">Home</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="#" class="footer-link">
+              <ion-icon name="chevron-forward"></ion-icon>
+
+              <span class="span">HealthMate (Bot)</span>
+            </a>
+          </li>
+
+          <li>
+            <a href="../frontend/maps.html" class="footer-link">
+              <ion-icon name="chevron-forward"></ion-icon>
+
+              <span class="span">ArogyaLocator</span>
+            </a>
+          </li>
+
+        </ul>
+
+        <ul class="footer-list">
+             
+  
+        </ul>
+
+        <ul class="footer-list">
+
+          <li>
+            <p class="footer-list-title">Contact Details</p>
+          </li>
+
+          <li class="footer-item">
+            <ion-icon name="location-outline"></ion-icon>
+
+            <address class="address">
+                Fully Online Platform
+              
+            </address>
+          </li>
+
+          <li class="footer-item">
+            <ion-icon name="mail-outline"></ion-icon>
+
+            <a href="support@healthassist.com" class="footer-link">support@healthassist.com</a>
+          </li>
+
+          <li class="footer-item">
+            <ion-icon name="call-outline"></ion-icon>
+
+            <a href="tel:123456789" class="footer-link">+91 1234567890</a>
+          </li>
+
+        </ul>
+
+      </div>
+    </div>
+
+  </footer>
+
+
+
+
+
+  <!-- 
+    - #BACK TO TOP
+  -->
+
+  <a href="#top" class="back-top-btn" aria-label="back to top" data-back-top-btn>
+    <ion-icon name="arrow-up" aria-hidden="true"></ion-icon>
+  </a>
+
+
+
+
+
+  <!-- 
+    - custom js link
+  -->
+  <script src="./assets/js/script.js" defer></script>
+
+  <!-- 
+    - ionicon link
+  -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+
+</html>

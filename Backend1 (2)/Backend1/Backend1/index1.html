@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            padding: 20px;
+        }
+        #chat {
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-window {
+            height: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            overflow-y: scroll;
+            background-color: white;
+        }
+        #user-input {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #send-button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #send-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Healthcare Assistant</h1>
+    </header>
+
+    <main>
+        <section id="chatbot-section">
+            <h2>Chat with the Healthcare Assistant</h2>
+            <div id="chat">
+                <div id="chat-window"></div>
+                <input type="text" id="user-input" placeholder="Ask me anything...">
+                <button id="send-button">Send</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.getElementById('send-button').addEventListener('click', async () => {
+            const userInput = document.getElementById('user-input').value;
+            const chatWindow = document.getElementById('chat-window');
+
+            // Add user message to chat window
+            chatWindow.innerHTML += `<p><strong>You:</strong> ${userInput}</p>`;
+
+            // Send user input to the chatbot
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: userInput }),
+            });
+            const data = await response.json();
+
+            // Add chatbot response to chat window
+            chatWindow.innerHTML += `<p><strong>Bot:</strong> ${data.response}</p>`;
+            chatWindow.scrollTop = chatWindow.scrollHeight; // Scroll to the bottom
+        });
+    </script>
+</body>
+</html>
